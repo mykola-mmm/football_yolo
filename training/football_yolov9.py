@@ -41,8 +41,9 @@ else:
         devices = 0
         print(f"Using single GPU: {torch.cuda.get_device_name(0)}")
     else:
-        devices = list(range(num_gpus))
-        print(f"Using {num_gpus} GPUs: {', '.join([torch.cuda.get_device_name(i) for i in range(num_gpus)])}")
+        devices = 0
+        # devices = list(range(num_gpus))
+        # print(f"Using {num_gpus} GPUs: {', '.join([torch.cuda.get_device_name(i) for i in range(num_gpus)])}")
 print("++++++++++++++++++++++++")
 print(devices)
 print("++++++++++++++++++++++++")
