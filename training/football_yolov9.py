@@ -57,13 +57,13 @@ def wandb_callback(trainer):
         torch.save(trainer.model.state_dict(), checkpoint_path)
         wandb.save(checkpoint_path)
         
-        # Log additional visualizations if available
-        if hasattr(trainer, 'validator') and hasattr(trainer.validator, 'metrics'):
-            val_metrics = trainer.validator.metrics
-            if 'confusion_matrix' in val_metrics:
-                wandb.log({"confusion_matrix": val_metrics['confusion_matrix']})
-            if 'pr_curve' in val_metrics:
-                wandb.log({"pr_curve": val_metrics['pr_curve']})
+        # # Log additional visualizations if available
+        # if hasattr(trainer, 'validator') and hasattr(trainer.validator, 'metrics'):
+        #     val_metrics = trainer.validator.metrics
+        #     if 'confusion_matrix' in val_metrics:
+        #         wandb.log({"confusion_matrix": val_metrics['confusion_matrix']})
+        #     if 'pr_curve' in val_metrics:
+        #         wandb.log({"pr_curve": val_metrics['pr_curve']})
 
 # Add custom WandB callback
 add_wandb_callback(model, enable_model_checkpointing=True)
