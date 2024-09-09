@@ -1,5 +1,4 @@
 ultralytics==8.2.90
-# ultralytics==8.0.238
 roboflow==1.1.44
 kaggle==1.6.17
 python-dotenv==1.0.1
@@ -7,3 +6,4 @@ roboflow==1.1.44
 opencv-python==4.10.0.84
 # wandb==0.17.9
 ray==2.35.0
+supervision==0.23.0

@@ -1,4 +1,5 @@
 from utils import *
+from trackers import *
 
 def main():
     video_frames, fps  = read_video('input_vids/08fd33_4.mp4')
