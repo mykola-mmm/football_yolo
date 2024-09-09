@@ -29,6 +29,13 @@ utils.fix_dataset_yaml(dataset)
 #             'football-players-detection-12/football-players-detection-12/valid')
 
 # model = YOLO("yolov9e.yaml")
-model = YOLO("yolov9s.yaml")
+# model = YOLO("yolov9s.yaml") # p100 - 5.9/16.0
+model = YOLO("yolov9m.yaml")
+
 model.info()
-results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640, verbose=True, device=0)
+results = model.train(data=os.path.join(dataset.location,'data.yaml'),
+                      epochs=1,
+                      imgsz=640,
+                      verbose=True,
+                      device=0,
+                      project='football_assistant')

@@ -1,4 +1,5 @@
-train_vids/*
+output_vids/*
+input_vids/*
 runs/*
 football-players-detection-12/*
 
