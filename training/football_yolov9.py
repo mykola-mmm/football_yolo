@@ -28,6 +28,7 @@ utils.fix_dataset_yaml(dataset)
 # shutil.move('football-players-detection-12/valid', 
 #             'football-players-detection-12/football-players-detection-12/valid')
 
-model = YOLO("yolov9e.yaml")
+# model = YOLO("yolov9e.yaml")
+model = YOLO("yolov9s.yaml")
 model.info()
-results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640, verbose=True)
+results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640, verbose=True, device=0,1)
