@@ -73,7 +73,7 @@ model.add_callback("on_train_epoch_end", wandb_callback)
 results = model.train(
     data=os.path.join(dataset.location, 'data.yaml'),
     epochs=100,
-    imgsz=1280,
+    imgsz=640,
     verbose=True,
     device=devices,
     project='wandb-test',
