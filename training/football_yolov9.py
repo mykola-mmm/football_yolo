@@ -77,7 +77,7 @@ results = model.train(
     verbose=True,
     device=devices,
     project='wandb-test',
-    # save_period=10
+    save_period=5
 )
 
 wandb.finish()
