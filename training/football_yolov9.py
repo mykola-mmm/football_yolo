@@ -76,7 +76,7 @@ results = model.train(
     verbose=True,
     device=devices,
     project='football_assistant',
-    save_period=10
+    # save_period=10
 )
 
 wandb.finish()
