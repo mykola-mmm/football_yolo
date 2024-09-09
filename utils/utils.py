@@ -14,3 +14,14 @@ def get_roboflow_api():
         load_dotenv()
         return os.getenv("ROBOFLOW_API")
 
+def fix_dataset_yaml(dataset):
+    YAML_PATH = os.path.join(dataset.location, 'data.yaml')
+    with open(YAML_PATH, 'r') as file:
+        yaml_data = file.read()
+
+    yaml_data = yaml_data.replace('test: ../test/images', 'test: test/images')
+    yaml_data = yaml_data.replace('train: football-players-detection-12/train/images', 'train: train/images')
+    yaml_data = yaml_data.replace('val: football-players-detection-12/valid/images', 'val: valid/images')
+
+    with open(YAML_PATH, 'w') as file:
+        file.write(yaml_data)
