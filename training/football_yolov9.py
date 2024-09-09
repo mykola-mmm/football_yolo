@@ -28,14 +28,14 @@ wandb.init(project="football_assistant", job_type="training")
 rf = Roboflow(api_key=ROBOFLOW_API)
 project = rf.workspace("roboflow-jvuqo").project("football-players-detection-3zvbc")
 version = project.version(12)
-dataset = version.download("yolov8")
+dataset = version.download("yolov9")
 
 # fix data.yaml pathes
 utils.fix_dataset_yaml(dataset)
 
 # model = YOLO("yolov9s.yaml") # not working with wandb
 # model = YOLO("yolov8m.yaml")
-model = YOLO("yolov8m.pt")
+model = YOLO("yolov9m.pt")
 
 model.info()
 
