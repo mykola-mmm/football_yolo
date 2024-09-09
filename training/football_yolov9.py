@@ -10,9 +10,12 @@ from ultralytics import YOLO
 import shutil
 
 # disable wandb prompt message that requires user input and freezes the kernel
-os.environ['WANDB_MODE'] = 'disabled'
+# os.environ['WANDB_MODE'] = 'disabled'
 
+# get api keys
 ROBOFLOW_API = utils.get_roboflow_api()
+WANDB_API = utils.get_wandb_api()
+
 rf = Roboflow(api_key=ROBOFLOW_API)
 project = rf.workspace("roboflow-jvuqo").project("football-players-detection-3zvbc")
 version = project.version(12)
