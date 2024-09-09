@@ -20,6 +20,7 @@ from ultralytics import YOLO
 ROBOFLOW_API = utils.get_roboflow_api()
 WANDB_API = utils.get_wandb_api()
 
+wandb.require("core")
 wandb.login(key=WANDB_API)
 wandb.init(project="football_assistant", job_type="training")
 
