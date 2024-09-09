@@ -33,7 +33,9 @@ dataset = version.download("yolov9")
 utils.fix_dataset_yaml(dataset)
 
 # model = YOLO("yolov9s.yaml") # not working with wandb
-model = YOLO("yolov8m.yaml")
+# model = YOLO("yolov8m.yaml")
+model = YOLO("yolov8m.pt")
+
 model.info()
 
 device = None
