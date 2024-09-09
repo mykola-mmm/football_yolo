@@ -16,7 +16,7 @@ WANDB_API = utils.get_wandb_api()
 # Initialize WandB
 wandb.require("core")
 wandb.login(key=WANDB_API)
-wandb.init(project="football_assistant", job_type="training")
+wandb.init(project="wandb-init", job_type="training")
 
 # Set up Roboflow dataset
 rf = Roboflow(api_key=ROBOFLOW_API)
@@ -75,7 +75,7 @@ results = model.train(
     imgsz=1280,
     verbose=True,
     device=devices,
-    project='football_assistant',
+    project='wandb-test',
     # save_period=10
 )
 
