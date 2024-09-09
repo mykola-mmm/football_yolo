@@ -10,7 +10,8 @@ import wandb
 import torch
 from wandb.integration.ultralytics import add_wandb_callback
 from roboflow import Roboflow
-from ultralytics import YOLO
+# from ultralytics import YOLO
+from ultralytics.engine.model import YOLO
 
 
 # disable wandb prompt message that requires user input and freezes the kernel
