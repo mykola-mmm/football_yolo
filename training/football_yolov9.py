@@ -31,7 +31,7 @@ dataset = version.download("yolov9")
 # fix data.yaml pathes
 utils.fix_dataset_yaml(dataset)
 
-model = YOLO("yolov9m.yaml")
+model = YOLO("yolov9s.yaml")
 model.info()
 
 device = None
