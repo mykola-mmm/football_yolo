@@ -31,15 +31,22 @@ utils.fix_dataset_yaml(dataset)
 model = YOLO("yolov9m.pt")
 model.info()
 
-# Set device
-device = None
-if torch.cuda.is_available():
-    print("GPU is available")
-    print(f"GPU device name: {torch.cuda.get_device_name(0)}")
-    device = 0
+# Set device based on GPU availability
+if not torch.cuda.is_available():
+    devices = "cpu"
+    print("Using CPU")
 else:
-    print("GPU is not available")
-    device = "cpu"
+    num_gpus = torch.cuda.device_count()
+    if num_gpus == 1:
+        devices = 0
+        print(f"Using single GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        devices = list(range(num_gpus))
+        print(f"Using {num_gpus} GPUs: {', '.join([torch.cuda.get_device_name(i) for i in range(num_gpus)])}")
+print("++++++++++++++++++++++++")
+print(devices)
+print("++++++++++++++++++++++++")
+
 
 # Configure WandB callback
 def wandb_callback(trainer):
@@ -67,7 +74,7 @@ results = model.train(
     epochs=100,
     imgsz=1280,
     verbose=True,
-    device=device,
+    device=devices,
     project='football_assistant'
 )
 
