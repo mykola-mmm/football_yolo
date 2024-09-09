@@ -43,17 +43,19 @@ else:
 
 # Configure WandB callback
 def wandb_callback(trainer):
-    if trainer.epoch % 5 == 0:
+    if trainer.epoch % 10 == 0:
         # Save model checkpoint
         checkpoint_path = f"model_checkpoint_epoch_{trainer.epoch}.pt"
-        trainer.model.save(checkpoint_path)
+        torch.save(trainer.model.state_dict(), checkpoint_path)
         wandb.save(checkpoint_path)
         
-        # Log additional visualizations
-        wandb.log({
-            "pr_curve": wandb.plot.pr_curve(trainer.validation.probs, trainer.validation.targets, labels=trainer.model.names),
-            "confusion_matrix": wandb.plot.confusion_matrix(probs=trainer.validation.probs, y_true=trainer.validation.targets, class_names=trainer.model.names),
-        })
+        # Log additional visualizations if available
+        if hasattr(trainer, 'validator') and hasattr(trainer.validator, 'metrics'):
+            val_metrics = trainer.validator.metrics
+            if 'confusion_matrix' in val_metrics:
+                wandb.log({"confusion_matrix": val_metrics['confusion_matrix']})
+            if 'pr_curve' in val_metrics:
+                wandb.log({"pr_curve": val_metrics['pr_curve']})
 
 # Add custom WandB callback
 add_wandb_callback(model, enable_model_checkpointing=True)
