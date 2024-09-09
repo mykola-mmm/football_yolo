@@ -14,15 +14,15 @@ from ultralytics import YOLO
 
 
 # disable wandb prompt message that requires user input and freezes the kernel
-os.environ['WANDB_MODE'] = 'disabled'
+# os.environ['WANDB_MODE'] = 'disabled'
 
 # get api keys
 ROBOFLOW_API = utils.get_roboflow_api()
 WANDB_API = utils.get_wandb_api()
 
-# wandb.require("core")
-# wandb.login(key=WANDB_API)
-# wandb.init(project="football_assistant", job_type="training")
+wandb.require("core")
+wandb.login(key=WANDB_API)
+wandb.init(project="football_assistant", job_type="training")
 
 rf = Roboflow(api_key=ROBOFLOW_API)
 project = rf.workspace("roboflow-jvuqo").project("football-players-detection-3zvbc")
@@ -32,7 +32,8 @@ dataset = version.download("yolov9")
 # fix data.yaml pathes
 utils.fix_dataset_yaml(dataset)
 
-model = YOLO("yolov9s.yaml")
+# model = YOLO("yolov9s.yaml") # not working with wandb
+model = YOLO("yolov8m.yaml")
 model.info()
 
 device = None
@@ -44,8 +45,8 @@ else:
     print("GPU is not available")
     device = "cpu"
 
-# add_wandb_callback(model, enable_model_checkpointing=True)
+add_wandb_callback(model, enable_model_checkpointing=True)
 
 results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=5, imgsz=640, verbose=True, device=device, project='football_assistant')
 
-# wandb.finish()
+wandb.finish()
