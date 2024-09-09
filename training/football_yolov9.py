@@ -28,7 +28,7 @@ dataset = version.download("yolov9")
 utils.fix_dataset_yaml(dataset)
 
 # Initialize YOLO model
-model = YOLO("yolov9s.pt")
+model = YOLO("yolov9m.pt")
 model.info()
 
 # Set device based on GPU availability
