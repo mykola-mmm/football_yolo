@@ -27,4 +27,4 @@ utils.fix_dataset_yaml(dataset)
 
 model = YOLO("yolov9e.yaml")
 model.info()
-results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640, wandb=False)
+results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640)
