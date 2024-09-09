@@ -1,2 +1,6 @@
 train_vids/*
 runs/*
+football-players-detection-12/*
+
+*__pycache__*
+.env

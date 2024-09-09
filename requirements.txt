@@ -1,0 +1,5 @@
+ultralytics==8.2.90
+roboflow==1.1.44
+kaggle==1.6.17
+python-dotenv==1.0.1
+roboflow==1.1.44
