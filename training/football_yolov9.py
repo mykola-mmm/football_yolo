@@ -45,11 +45,6 @@ else:
 
 add_wandb_callback(model, enable_model_checkpointing=True)
 
-results = model.train(data=os.path.join(dataset.location,'data.yaml'),
-                      epochs=5,
-                      imgsz=640,
-                      verbose=True,
-                      device=device,
-                      project='football_assistant')
+results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=5, imgsz=640, verbose=True, device=device, project='football_assistant')
 
 wandb.finish()
