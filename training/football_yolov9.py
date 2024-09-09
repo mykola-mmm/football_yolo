@@ -9,6 +9,9 @@ from roboflow import Roboflow
 from ultralytics import YOLO
 import shutil
 
+# disable wandb prompt message that requires user input and freezes the kernel
+os.environ['WANDB_MODE'] = 'disabled'
+
 ROBOFLOW_API = utils.get_roboflow_api()
 rf = Roboflow(api_key=ROBOFLOW_API)
 project = rf.workspace("roboflow-jvuqo").project("football-players-detection-3zvbc")
@@ -27,4 +30,4 @@ utils.fix_dataset_yaml(dataset)
 
 model = YOLO("yolov9e.yaml")
 model.info()
-results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640)
+results = model.train(data=os.path.join(dataset.location,'data.yaml'), epochs=100, imgsz=640, verbose=True)
