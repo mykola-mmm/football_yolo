@@ -44,30 +44,14 @@ else:
         devices = 0
         # devices = list(range(num_gpus))
         # print(f"Using {num_gpus} GPUs: {', '.join([torch.cuda.get_device_name(i) for i in range(num_gpus)])}")
+
 print("++++++++++++++++++++++++")
 print(devices)
 print("++++++++++++++++++++++++")
 
 
-# Configure WandB callback
-def wandb_callback(trainer):
-    if trainer.epoch % 10 == 0:
-        # Save model checkpoint
-        checkpoint_path = f"model_checkpoint_epoch_{trainer.epoch}.pt"
-        torch.save(trainer.model.state_dict(), checkpoint_path)
-        wandb.save(checkpoint_path)
-        
-        # # Log additional visualizations if available
-        # if hasattr(trainer, 'validator') and hasattr(trainer.validator, 'metrics'):
-        #     val_metrics = trainer.validator.metrics
-        #     if 'confusion_matrix' in val_metrics:
-        #         wandb.log({"confusion_matrix": val_metrics['confusion_matrix']})
-        #     if 'pr_curve' in val_metrics:
-        #         wandb.log({"pr_curve": val_metrics['pr_curve']})
-
 # Add custom WandB callback
 add_wandb_callback(model, enable_model_checkpointing=True)
-model.add_callback("on_train_epoch_end", wandb_callback)
 
 # Train the model
 results = model.train(
@@ -77,6 +61,7 @@ results = model.train(
     verbose=True,
     device=devices,
     project='wandb-test',
+    save_period=3
 )
 
 wandb.finish()
