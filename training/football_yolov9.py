@@ -14,9 +14,10 @@ ROBOFLOW_API = utils.get_roboflow_api()
 WANDB_API = utils.get_wandb_api()
 
 # Initialize WandB
-wandb.require("core")
-wandb.login(key=WANDB_API)
-wandb.init(project="wandb-init", job_type="training")
+os.environ['WANDB_MODE'] = 'disabled'
+# wandb.require("core")
+# wandb.login(key=WANDB_API)
+# wandb.init(project="wandb-init", job_type="training")
 # wandb.init(project="wandb-init", job_type="training",resume="allow", id="seq9v3hx")
 
 
@@ -54,18 +55,18 @@ finally:
 
 
 # Add custom WandB callback
-add_wandb_callback(model, enable_model_checkpointing=True)
+# add_wandb_callback(model, enable_model_checkpointing=True)
 
 # Train the model
 results = model.train(
     data=os.path.join(dataset.location, 'data.yaml'),
-    epochs=100,
+    epochs=10,
     batch=-1, # auto mode with 60% GPU utilization
     imgsz=1280,
     verbose=True,
     device=devices,
     project='wandb-test',
-    save_period=5,
+    save_period=2,
 )
 
-wandb.finish()
+# wandb.finish()
