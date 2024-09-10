@@ -1,7 +1,10 @@
 output_vids/*
-input_vids/*
+# input_vids/*
 runs/*
+wandb/*
 football-players-detection-12/*
+artifacts/*
+football_assistant/*
 
 *__pycache__*
 .env
