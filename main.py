@@ -18,6 +18,11 @@ def main():
         thickness=2,
     )
 
+    label_annotator = sv.LabelAnnotator(
+        color=sv.ColorPalette.DEFAULT,
+        text_color=sv.ColorPalette.from_hex("#000000"),
+    )
+
     frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
     frame = next(frame_generator)
 
@@ -26,6 +31,7 @@ def main():
 
     annotated_frame = frame.copy()
     annotated_frame = box_annotator.annotate(annotated_frame, detections)
+    annotated_frame = label_annotator.annotate(annotated_frame, detections)
 
     sv.plot_image(frame)
     sv.plot_image(annotated_frame)
