@@ -13,13 +13,16 @@ def main():
     model = YOLO(model_path)
     print(model.info())
 
-    box_annotator = sv.BoxAnnotator()
+    box_annotator = sv.BoxAnnotator(
+        color=sv.ColorPalette.DEFAULT,
+        thickness=2,
+    )
 
     frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
     frame = next(frame_generator)
 
-    result = model(frame)
-    detections = sv.Detections.from_inference(result)
+    result = model(frame)[0]
+    detections = sv.Detections.from_ultralytics(result)
 
     annotated_frame = frame.copy()
     annotated_frame = box_annotator.annotate(annotated_frame, detections)
