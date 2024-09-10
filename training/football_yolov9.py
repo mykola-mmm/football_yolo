@@ -20,7 +20,7 @@ HF_TOKEN = utils.get_hugging_face_api()
 # os.environ['WANDB_MODE'] = 'disabled'
 wandb.require("core")
 wandb.login(key=WANDB_API)
-wandb.init(project="football_yolov9", job_type="training")
+wandb.init(project="football_yolov8", job_type="training")
 # wandb.init(project="wandb-init", job_type="training",resume="allow", id="seq9v3hx")
 
 # Initialize Hugging Face API
@@ -29,13 +29,13 @@ wandb.init(project="football_yolov9", job_type="training")
 rf = Roboflow(api_key=ROBOFLOW_API)
 project = rf.workspace("roboflow-jvuqo").project("football-players-detection-3zvbc")
 version = project.version(12)
-dataset = version.download("yolov9")
+dataset = version.download("yolov8")
 
 # Fix data.yaml paths
 utils.fix_dataset_yaml(dataset)
 
 # Initialize YOLO model
-model = YOLO("yolov9m.pt")
+model = YOLO("yolov8m.pt")
 model.info()
 
 # Set device based on GPU availability
@@ -59,7 +59,7 @@ finally:
 
 
 # Add custom WandB callback
-add_wandb_callback(model,  enable_model_checkpointing=True)
+add_wandb_callback(model, enable_model_checkpointing=True)
 
 # Train the model
 results = model.train(
