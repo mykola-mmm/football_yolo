@@ -10,3 +10,4 @@ supervision==0.23.0
 # supervision==0.22.0
 # inference==0.18.1
 # matplotlib==3.9.2
+tqdm==4.66.5
