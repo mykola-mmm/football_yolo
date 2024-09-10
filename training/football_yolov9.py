@@ -66,11 +66,12 @@ results = model.train(
     data=os.path.join(dataset.location, 'data.yaml'),
     epochs=10,
     batch=-1, # auto mode with 60% GPU utilization
-    imgsz=1280,
+    imgsz=640,
     verbose=True,
     device=devices,
-    project='wandb-test',
-    save_period=2,
+    project='trained_models',
+    save_period=4,
+    fraction=0.01,
 )
 
 # wandb.finish()
