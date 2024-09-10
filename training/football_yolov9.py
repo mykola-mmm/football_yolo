@@ -59,7 +59,7 @@ finally:
 
 
 # Add custom WandB callback
-add_wandb_callback(model, enable_model_checkpointing=True)
+add_wandb_callback(model, enable_model_checkpointing=False)
 
 # Train the model
 results = model.train(
