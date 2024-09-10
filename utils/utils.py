@@ -1,6 +1,7 @@
 import os
 import wandb
 
+
 def is_running_in_kaggle():
     return 'KAGGLE_KERNEL_RUN_TYPE' in os.environ
 

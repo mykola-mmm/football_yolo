@@ -11,7 +11,7 @@ def main():
     model_path = load_model_and_get_path_wandb(run=run, model_name="mykola-mazniuk-1/wandb-init/run_seq9v3hx_model:latest")
     model = YOLO(model_path)
     print(model.info())
-    frame_generator = sv.get_frame_generator(SOURCE_VIDEO_PATH)
+    frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
     frame = next(frame_generator)
     sv.plot_image(frame)
 
