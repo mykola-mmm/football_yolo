@@ -72,7 +72,7 @@ results = model.train(
     project='trained_models',
     save_period=10,
     # save=False,
-    fraction=0.01,
+    fraction=1,
 )
 
 # wandb.finish()
