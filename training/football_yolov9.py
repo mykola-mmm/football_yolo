@@ -28,26 +28,27 @@ dataset = version.download("yolov9")
 utils.fix_dataset_yaml(dataset)
 
 # Initialize YOLO model
-model = YOLO("yolov9s.pt")
+model = YOLO("yolov9m.pt")
 model.info()
 
 # Set device based on GPU availability
-if not torch.cuda.is_available():
-    devices = "cpu"
-    print("Using CPU")
-else:
-    num_gpus = torch.cuda.device_count()
-    if num_gpus == 1:
-        devices = 0
-        print(f"Using single GPU: {torch.cuda.get_device_name(0)}")
+devices = None
+try:
+    if not torch.cuda.is_available():
+        devices = "cpu"
+        print("Using CPU")
     else:
-        devices = 0
-        # devices = list(range(num_gpus))
-        # print(f"Using {num_gpus} GPUs: {', '.join([torch.cuda.get_device_name(i) for i in range(num_gpus)])}")
-
-print("++++++++++++++++++++++++")
-print(devices)
-print("++++++++++++++++++++++++")
+        num_gpus = torch.cuda.device_count()
+        if num_gpus == 1:
+            devices = 0
+            print(f"Using single GPU: {torch.cuda.get_device_name(0)}")
+        else:
+            devices = list(range(num_gpus))
+            print(f"Using {num_gpus} GPUs: {', '.join([torch.cuda.get_device_name(i) for i in range(num_gpus)])}")
+finally:
+    print("\n++++++++++++++++++++++++")
+    print(f"Devices: {devices}")
+    print("++++++++++++++++++++++++\n")
 
 
 # Add custom WandB callback
@@ -57,11 +58,12 @@ add_wandb_callback(model, enable_model_checkpointing=True)
 results = model.train(
     data=os.path.join(dataset.location, 'data.yaml'),
     epochs=100,
-    imgsz=640,
+    batch=-1, # auto mode with 60% GPU utilization
+    imgsz=1280,
     verbose=True,
     device=devices,
     project='wandb-test',
-    save_period=3
+    save_period=5,
 )
 
 wandb.finish()
