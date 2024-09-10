@@ -16,7 +16,9 @@ WANDB_API = utils.get_wandb_api()
 # Initialize WandB
 wandb.require("core")
 wandb.login(key=WANDB_API)
-wandb.init(project="wandb-init", job_type="training")
+# wandb.init(project="wandb-init", job_type="training")
+wandb.init(project="wandb-init", job_type="training",resume="allow", id="run_seq9v3hx_model")
+
 
 # Set up Roboflow dataset
 rf = Roboflow(api_key=ROBOFLOW_API)
