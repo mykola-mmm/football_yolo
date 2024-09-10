@@ -4,7 +4,6 @@ import wandb
 from ultralytics import YOLO
 import supervision as sv
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 SOURCE_VIDEO_PATH = "./input_vids/08fd33_4.mp4"
 
