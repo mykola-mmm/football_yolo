@@ -27,6 +27,17 @@ def get_wandb_api():
         load_dotenv()
         return os.getenv("WANDB_API")
 
+def get_hugging_face_api():
+    if is_running_in_kaggle():
+        print("This code is running in a Kaggle notebook")
+        from kaggle_secrets import UserSecretsClient
+        user_secrets = UserSecretsClient()
+        return user_secrets.get_secret("hugging_face_access_token")
+    else:
+        from dotenv import load_dotenv
+        load_dotenv()
+        return os.getenv("HF_ACCESS_TOKEN")
+
 def fix_dataset_yaml(dataset):
     YAML_PATH = os.path.join(dataset.location, 'data.yaml')
     with open(YAML_PATH, 'r') as file:

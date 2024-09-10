@@ -8,18 +8,22 @@ import torch
 from wandb.integration.ultralytics import add_wandb_callback
 from roboflow import Roboflow
 from ultralytics import YOLO
+from huggingface_hub import HfApi, login
+
 
 # Get API keys
 ROBOFLOW_API = utils.get_roboflow_api()
 WANDB_API = utils.get_wandb_api()
+HF_TOKEN = utils.get_hugging_face_api()
 
 # Initialize WandB
-os.environ['WANDB_MODE'] = 'disabled'
-# wandb.require("core")
-# wandb.login(key=WANDB_API)
-# wandb.init(project="wandb-init", job_type="training")
+# os.environ['WANDB_MODE'] = 'disabled'
+wandb.require("core")
+wandb.login(key=WANDB_API)
+wandb.init(project="football_yolov9", job_type="training")
 # wandb.init(project="wandb-init", job_type="training",resume="allow", id="seq9v3hx")
 
+# Initialize Hugging Face API
 
 # Set up Roboflow dataset
 rf = Roboflow(api_key=ROBOFLOW_API)
@@ -55,7 +59,7 @@ finally:
 
 
 # Add custom WandB callback
-# add_wandb_callback(model, enable_model_checkpointing=True)
+add_wandb_callback(model, enable_model_checkpointing=True)
 
 # Train the model
 results = model.train(
