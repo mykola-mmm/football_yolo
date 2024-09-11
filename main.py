@@ -12,7 +12,8 @@ BALL_ID = 0
 
 def main():
     run = init_wandb(project="wandb-validate", job_type="validation")
-    model_path = load_model_and_get_path_wandb(run=run, model_name="mykola-mazniuk-1/wandb-init/run_seq9v3hx_model:latest")
+    # model_path = load_model_and_get_path_wandb(run=run, model_name="mykola-mazniuk-1/wandb-init/run_seq9v3hx_model:latest")
+    model_path = './models/yolov9m_epoch284.pt'
     model = YOLO(model_path)
     print(model.info())
 
