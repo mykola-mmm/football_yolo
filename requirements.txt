@@ -13,3 +13,10 @@ supervision==0.23.0
 tqdm==4.66.5
 huggingface-hub==0.24.6
 # opencv-python==4.10.0.84
+torch==2.4.1
+transformers==4.44.2
+more-itertools==10.5.0
+protobuf==3.20.3
+numpy==1.26.4
+umap-learn==0.5.6
+scikit-learn==1.5.2

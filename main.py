@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from utils import *
 from trackers import *
 import wandb
@@ -8,6 +9,14 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import cv2
 import datetime
+import torch
+from transformers import AutoProcessor, SiglipVisionModel
+from more_itertools import chunked
+import umap
+from sklearn.cluster import KMeans
+
+SIGLIP_MODEL_PATH = "google/siglip-base-patch16-224"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 SOURCE_VIDEO_PATH = "./input_vids/08fd33_4.mp4"
 TARGET_VIDEO_PATH = "./output_vids/08fd33_4_result.mp4"
@@ -19,12 +28,20 @@ PLAYER_ID = 2
 REFEREE_ID = 3
 
 STRIDE = 30
+BATCH_SIZE = 32
 
 TEST = False
 
 def setup_logger():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     return logging.getLogger(__name__)
+
+def prepare_siglip_model():
+    global SIGLIP_MODEL_PATH, DEVICE, EMBEDDING_MODEL, EMBEDDING_PROCESSOR
+    SIGLIP_MODEL_PATH = "google/siglip-base-patch16-224"
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+    EMBEDDING_MODEL = SiglipVisionModel.from_pretrained(SIGLIP_MODEL_PATH).to(DEVICE)
+    EMBEDDING_PROCESSOR = AutoProcessor.from_pretrained(SIGLIP_MODEL_PATH)
 
 def extract_crops(model: YOLO, source_video_path, stride=STRIDE):
     frame_generator = sv.get_video_frames_generator(source_video_path, stride=stride)
@@ -130,8 +147,56 @@ def main():
         cv2.imwrite(TARGET_IMAGE_PATH, annotated_frame)
         # cv2.imwrite(TARGET_IMAGE_PATH, cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
 
-    crops = extract_crops(model, SOURCE_VIDEO_PATH, stride=300)
+    crops = extract_crops(model, SOURCE_VIDEO_PATH, stride=STRIDE)
     sv.plot_images_grid(crops[:100], grid_size=(10, 10))
+
+    prepare_siglip_model()
+
+    crops = [sv.cv2_to_pillow(crop) for crop in crops]
+    logger.info(f"len(crops): {len(crops)}")
+
+    batches = chunked(crops, BATCH_SIZE)
+
+    data = []
+
+    with torch.no_grad():
+        for batch in tqdm(batches, desc="Embeddings extraction"):
+            inputs = EMBEDDING_PROCESSOR(images=batch, return_tensors="pt").to(DEVICE)
+            outputs = EMBEDDING_MODEL(**inputs)
+            logger.info(f"outputs.last_hidden_state.shape: {outputs.last_hidden_state.shape}")
+            embeddings = torch.mean(outputs.last_hidden_state, dim=1).cpu().numpy()
+            logger.info(f"embeddings.shape: {embeddings.shape}")
+            data.append(embeddings)
+
+    data = np.concatenate(data)
+    logger.info(f"data.shape: {data.shape}")
+
+    REDUCER = umap.UMAP(n_components=3)
+    CLUSTERING_NODEL = KMeans(n_clusters=2)
+
+    projections = REDUCER.fit_transform(data)
+    logger.info(f"projections.shape: {projections.shape}")
+
+    clusters = CLUSTERING_NODEL.fit_predict(projections)
+    logger.info(f"clusters: {clusters}")
+
+    team_0 = [
+        crop
+        for crop, cluster
+        in zip(crops, clusters)
+        if cluster == 0
+    ]
+
+    team_1 = [
+        crop
+        for crop, cluster
+        in zip(crops, clusters)
+        if cluster == 1
+    ]
+
+    sv.plot_images_grid(team_0[:100], grid_size=(10, 10))
+    sv.plot_images_grid(team_1[:100], grid_size=(10, 10))
+
 
 if __name__ == '__main__':
     main()
