@@ -49,7 +49,7 @@ dataset = version.download("yolov8")
 fix_dataset_yaml(dataset)
 
 # Initialize YOLO model
-model = YOLO("yolov8x.pt")
+model = YOLO("yolov8x-pose.pt")
 model.info()
 
 # Set device based on GPU availability
@@ -85,7 +85,7 @@ results = model.train(
     device=devices,
     project='trained_models',
     save_period=25,
-    fraction=1,
+    fraction=1
 )
 
 # wandb.finish()
