@@ -4,6 +4,7 @@ output_images/*
 runs/*
 wandb/*
 football-players-detection-12/*
+football-field-detection-15/*
 artifacts/*
 football_assistant/*
 

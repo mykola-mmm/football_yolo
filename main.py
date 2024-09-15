@@ -11,9 +11,9 @@ import cv2
 import datetime
 import torch
 from transformers import AutoProcessor, SiglipVisionModel
-from more_itertools import chunked
-import umap
-from sklearn.cluster import KMeans
+# from more_itertools import chunked
+# import umap
+# from sklearn.cluster import KMeans
 from ids import *
 from classifiers import TeamClassifier, goalkeeper_classifier
 
