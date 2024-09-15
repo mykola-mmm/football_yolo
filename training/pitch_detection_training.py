@@ -41,7 +41,7 @@ os.environ['WANDB_MODE'] = 'disabled'
 # Set up Roboflow dataset
 rf = Roboflow(api_key=ROBOFLOW_API)
 project = rf.workspace("roboflow-jvuqo").project("football-field-detection-f07vi")
-version = project.version(15)
+version = project.version(14)
 dataset = version.download("yolov8")
 
 
