@@ -14,6 +14,9 @@ TARGET_VIDEO_PATH = "./output_vids/08fd33_4_result.mp4"
 TARGET_IMAGE_PATH = f"./output_images/{datetime.datetime.now().strftime('%H%M%S_%Y%m%d')}.jpg"
 
 BALL_ID = 0
+GOLAKEEPER_ID = 1
+PLAYER_ID = 2
+REFEREE_ID = 3
 
 STRIDE = 30
 
@@ -22,6 +25,23 @@ TEST = False
 def setup_logger():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     return logging.getLogger(__name__)
+
+def extract_crops(model: YOLO, source_video_path, stride=STRIDE):
+    frame_generator = sv.get_video_frames_generator(source_video_path, stride=stride)
+    crops = []
+
+    video_info = sv.VideoInfo.from_video_path(source_video_path)
+
+    
+    for frame in tqdm(frame_generator, total=video_info.total_frames//stride, desc="Collecting crops"):
+        result = model(frame, conf=0.3)[0]
+        detections = sv.Detections.from_ultralytics(result)
+        detections = detections.with_nms(threshold=0.5, class_agnostic=False)
+        detections = detections[detections.class_id == PLAYER_ID]
+        crops += [
+            sv.crop_image(frame, xyxy) for xyxy in detections.xyxy
+        ]
+    return crops
 
 def main():
     logger =setup_logger()
@@ -110,11 +130,8 @@ def main():
         cv2.imwrite(TARGET_IMAGE_PATH, annotated_frame)
         # cv2.imwrite(TARGET_IMAGE_PATH, cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
 
-    frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH, stride=STRIDE)
-    crops = []
-
-    for frame in tqdm(frame_generator, total=video_info.total_frames // STRIDE, desc="Collecting crops"):
-        result = model(frame, conf=0.3)
+    crops = extract_crops(model, SOURCE_VIDEO_PATH, stride=300)
+    sv.plot_images_grid(crops[:100], grid_size=(10, 10))
 
 if __name__ == '__main__':
     main()
