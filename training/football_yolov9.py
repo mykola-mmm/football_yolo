@@ -8,7 +8,6 @@ import torch
 from wandb.integration.ultralytics import add_wandb_callback
 from roboflow import Roboflow
 from ultralytics import YOLO
-from huggingface_hub import HfApi, login
 
 
 # Get API keys
@@ -71,7 +70,6 @@ results = model.train(
     device=devices,
     project='trained_models',
     save_period=2,
-    # save=False,
     fraction=0.01,
 )
 
