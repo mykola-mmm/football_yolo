@@ -78,7 +78,22 @@ class TeamClassifier:
         return crops
 
 
+def goalkeeper_classifier(player_detections: sv.Detections,
+                          goalkeeper_detections: sv.Detections):
+    goalkeepers_xy = goalkeeper_detections.get_anchors_coordinates(sv.Position.BOTTOM_CENTER)
+    players_xy = player_detections.get_anchors_coordinates(sv.Position.BOTTOM_CENTER)
 
+    team_0_centroid = players_xy[player_detections.class_id == 0].mean(axis=0)
+    team_1_centroid = players_xy[player_detections.class_id == 1].mean(axis=0)
+
+    goalkeepers_team_ids = []
+    for goalkeeper_xy in goalkeepers_xy:
+        distances_to_team_0 = np.linalg.norm(goalkeeper_xy - team_0_centroid)
+        distances_to_team_1 = np.linalg.norm(goalkeeper_xy - team_1_centroid)
+        goalkeepers_team_ids.append(0 if distances_to_team_0 < distances_to_team_1 else 1)
+
+    return np.array(goalkeepers_team_ids)
+    
 
 
 

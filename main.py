@@ -15,7 +15,7 @@ from more_itertools import chunked
 import umap
 from sklearn.cluster import KMeans
 from ids import *
-from team_classifier import TeamClassifier
+from classifiers import TeamClassifier, goalkeeper_classifier
 
 
 
@@ -135,19 +135,26 @@ def main():
         player_detections.class_id = team_classifier.predict(player_crops)
         logger.info(f"player_detections.class_id: {player_detections.class_id}")
 
+        goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
+        goalkeeper_detections.class_id = goalkeeper_classifier(player_detections, goalkeeper_detections)
+
+        referee_detections = all_detections[all_detections.class_id == REFEREE_ID]
+
+        all_detections = sv.Detections.merge([player_detections, goalkeeper_detections, referee_detections])
+
         labels = [
             f"#{tracker_id}"
-            for tracker_id in player_detections.tracker_id
+            for tracker_id in all_detections.tracker_id
         ]
         logger.info(f"labels: {labels}")
 
 
         annotated_frame = frame.copy()
-        annotated_frame = ellipse_annotator.annotate(annotated_frame, player_detections)
+        annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
         annotated_frame = triangle_annotator.annotate(annotated_frame, ball_detections)
 
         # annotated_frame = box_annotator.annotate(annotated_frame, detections)
-        annotated_frame = label_annotator.annotate(annotated_frame, player_detections, labels)
+        annotated_frame = label_annotator.annotate(annotated_frame, all_detections, labels)
 
 
 
