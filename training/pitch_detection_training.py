@@ -14,10 +14,12 @@ def fix_dataset_yaml(dataset):
     with open(YAML_PATH, 'r') as file:
         yaml_data = file.read()
 
+    # yaml_data = yaml_data.replace('test: ../test/images', 'test: test/images')
+    # yaml_data = yaml_data.replace('train: football-field-detection-15/train/images', 'train: train/images')
+    # yaml_data = yaml_data.replace('val: football-field-detection-15/valid/images', 'val: valid/images')
     yaml_data = yaml_data.replace('test: ../test/images', 'test: test/images')
-    yaml_data = yaml_data.replace('train: football-field-detection-15/train/images', 'train: train/images')
-    yaml_data = yaml_data.replace('val: football-field-detection-15/valid/images', 'val: valid/images')
-
+    yaml_data = yaml_data.replace('train: football-field-detection-12/train/images', 'train: train/images')
+    yaml_data = yaml_data.replace('val: football-field-detection-12/valid/images', 'val: valid/images')
     with open(YAML_PATH, 'w') as file:
         file.write(yaml_data)
 
