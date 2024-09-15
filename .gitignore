@@ -1,5 +1,6 @@
 output_vids/*
 # input_vids/*
+output_images/*
 runs/*
 wandb/*
 football-players-detection-12/*

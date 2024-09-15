@@ -12,3 +12,4 @@ supervision==0.23.0
 # matplotlib==3.9.2
 tqdm==4.66.5
 huggingface-hub==0.24.6
+# opencv-python==4.10.0.84
