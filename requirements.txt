@@ -20,3 +20,4 @@ protobuf==3.20.3
 numpy==1.26.4
 umap-learn==0.5.6
 scikit-learn==1.5.2
+git+https://github.com/roboflow/sports.git
