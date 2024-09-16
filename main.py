@@ -138,7 +138,7 @@ def main():
                 player_detections = all_detections[all_detections.class_id == PLAYER_ID]
                 player_crops = [sv.crop_image(frame, xyxy) for xyxy in player_detections.xyxy]
                 # logger.info(f"player_detections.class_id: {player_detections.class_id}")
-                # player_detections.class_id = team_classifier.predict(player_crops)
+                player_detections.class_id = team_classifier.predict(player_crops)
                 # logger.info(f"player_detections.class_id: {player_detections.class_id}")
 
                 goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
