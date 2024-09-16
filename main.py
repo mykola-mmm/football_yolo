@@ -172,7 +172,7 @@ def main():
                 key_points = sv.KeyPoints.from_ultralytics(result)
 
                 annotated_frame = frame.copy()
-                # annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
+                annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
                 annotated_frame = triangle_annotator.annotate(annotated_frame, ball_detections)
 
                 # annotated_frame = box_annotator.annotate(annotated_frame, detections)
