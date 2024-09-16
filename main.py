@@ -32,9 +32,10 @@ STRIDE = 30
 BATCH_SIZE = 32
 
 TEST = True
+PROCESS_FULL_VIDEO = False
 
 def setup_logger():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s\n')
     return logging.getLogger(__name__)
 
 def prepare_siglip_model():
@@ -113,9 +114,12 @@ def main():
         video_sink = sv.VideoSink(TARGET_VIDEO_PATH, video_info)
         frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
         frame = next(frame_generator)
-        i = 0
+        i = 1
         with video_sink:
             for frame in tqdm(frame_generator, total=video_info.total_frames):
+                if i != 14:
+                    i+=1
+                    continue
 
                 result = model(frame)[0]
                 # print(f"result: {result}")
@@ -128,14 +132,14 @@ def main():
 
                 all_detections = all_detections.with_nms(threshold=0.5, class_agnostic=False)
                 # all_detections.class_id = all_detections.class_id - 1
-                logger.info(f"all_detections.tracker_id: {all_detections.tracker_id}")
+                # logger.info(f"all_detections.tracker_id: {all_detections.tracker_id}")
                 all_detections = tracker.update_with_detections(detections=all_detections)
 
                 player_detections = all_detections[all_detections.class_id == PLAYER_ID]
                 player_crops = [sv.crop_image(frame, xyxy) for xyxy in player_detections.xyxy]
-                logger.info(f"player_detections.class_id: {player_detections.class_id}")
+                # logger.info(f"player_detections.class_id: {player_detections.class_id}")
                 player_detections.class_id = team_classifier.predict(player_crops)
-                logger.info(f"player_detections.class_id: {player_detections.class_id}")
+                # logger.info(f"player_detections.class_id: {player_detections.class_id}")
 
                 goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
                 goalkeeper_detections.class_id = goalkeeper_classifier(player_detections, goalkeeper_detections)
@@ -143,12 +147,14 @@ def main():
                 referee_detections = all_detections[all_detections.class_id == REFEREE_ID]
 
                 all_detections = sv.Detections.merge([player_detections, goalkeeper_detections, referee_detections])
-
+                logger.info(f"all_detections: {all_detections}")
+                logger.info(f"all_detections.class_id: {all_detections.class_id}")
+                logger.info(f"all_detections.tracker_id: {all_detections.tracker_id}")
                 labels = [
                     f"#{tracker_id}"
                     for tracker_id in all_detections.tracker_id
                 ]
-                logger.info(f"labels: {labels}")
+                # logger.info(f"labels: {labels}")
 
                 result = pitch_model(frame, conf=0.5)[0]
                 key_points = sv.KeyPoints.from_ultralytics(result)
@@ -163,6 +169,11 @@ def main():
 
 
                 video_sink.write_frame(annotated_frame)
+                # if PROCESS_FULL_VIDEO:
+                #     i+=1
+                #     break
+                # else:
+                #     sv.plot_image(annotated_frame)
 
         # sv.plot_image(frame)
         # sv.plot_image(annotated_frame)
