@@ -62,6 +62,7 @@ def extract_crops(model: YOLO, source_video_path, stride=STRIDE):
     return crops
 
 def main():
+    os.makedirs('output_vids', exist_ok=True)
     logger =setup_logger()
     # run = init_wandb(project="wandb-validate", job_type="validation")
     # model_path = load_model_and_get_path_wandb(run=run, model_name="mykola-mazniuk-1/wandb-init/run_seq9v3hx_model:latest")
@@ -112,6 +113,7 @@ def main():
         video_sink = sv.VideoSink(TARGET_VIDEO_PATH, video_info)
         frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
         frame = next(frame_generator)
+        i = 0
         with video_sink:
             for frame in tqdm(frame_generator, total=video_info.total_frames):
 
@@ -160,9 +162,7 @@ def main():
                 annotated_frame = vertex_annotator.annotate(annotated_frame, key_points)
 
 
-
                 video_sink.write_frame(annotated_frame)
-                break
 
         # sv.plot_image(frame)
         # sv.plot_image(annotated_frame)
