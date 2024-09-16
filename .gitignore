@@ -1,4 +1,4 @@
-output_vids/*
+# output_vids/*
 # input_vids/*
 output_images/*
 runs/*
