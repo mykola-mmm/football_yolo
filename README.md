@@ -1,13 +1,6 @@
 # football_yolo
 
-## Demo Video
+![Football GIF](./input_vids/08fd33_4-ezgif.com-video-to-gif-converter.gif)
 
-[Watch the demo video](./input_vids/08fd33_4.mp4)
+![Football GIF](./output_vids/08fd33_4_result-ezgif.com-video-to-gif-converter.gif)
 
-
-## Demo Video
-
-<video width="640" height="360" controls>
-  <source src="./input_vids/08fd33_4.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
