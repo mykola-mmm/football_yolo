@@ -16,7 +16,9 @@ from transformers import AutoProcessor, SiglipVisionModel
 # from sklearn.cluster import KMeans
 from ids import *
 from classifiers import TeamClassifier, goalkeeper_classifier
-
+from sports.configs.soccer import SoccerPitchConfiguration
+from sports.annotators.soccer import draw_pitch
+from ViewTransformer import ViewTransformer
 
 
 SIGLIP_MODEL_PATH = "google/siglip-base-patch16-224"
@@ -26,6 +28,7 @@ SOURCE_VIDEO_PATH = "./input_vids/08fd33_4.mp4"
 TARGET_VIDEO_PATH = "./output_vids/08fd33_4_result.mp4"
 TARGET_IMAGE_PATH = f"./output_images/{datetime.datetime.now().strftime('%H%M%S_%Y%m%d')}.jpg"
 
+CONFIG = SoccerPitchConfiguration()
 
 
 STRIDE = 30
@@ -75,14 +78,14 @@ def main():
     print(pitch_model.info())
 
     # initialize team classifier
-    team_classifier = TeamClassifier(model_path, SIGLIP_MODEL_PATH)
-    team_classifier.fit(source_video_path=SOURCE_VIDEO_PATH,
-                        stride=STRIDE,
-                        confidence_threshold=0.3,
-                        umap_n_components=3,
-                        kmeans_n_clusters=2,
-                        batch_size=32,
-                        debug=False)
+    # team_classifier = TeamClassifier(model_path, SIGLIP_MODEL_PATH)
+    # team_classifier.fit(source_video_path=SOURCE_VIDEO_PATH,
+    #                     stride=STRIDE,
+    #                     confidence_threshold=0.3,
+    #                     umap_n_components=3,
+    #                     kmeans_n_clusters=2,
+    #                     batch_size=32,
+    #                     debug=False)
 
     if TEST:
         ellipse_annotator = sv.EllipseAnnotator(
@@ -98,6 +101,12 @@ def main():
         vertex_annotator = sv.VertexAnnotator(
             color=sv.Color.from_hex("#FFD700"),
             radius=10,
+        )
+
+        edge_annotator = sv.EdgeAnnotator(
+            color=sv.Color.from_hex("#FFD700"),
+            thickness=2,
+            edges = CONFIG.edges
         )
 
         label_annotator = sv.LabelAnnotator(
@@ -138,7 +147,7 @@ def main():
                 player_detections = all_detections[all_detections.class_id == PLAYER_ID]
                 player_crops = [sv.crop_image(frame, xyxy) for xyxy in player_detections.xyxy]
                 # logger.info(f"player_detections.class_id: {player_detections.class_id}")
-                player_detections.class_id = team_classifier.predict(player_crops)
+                # player_detections.class_id = team_classifier.predict(player_crops)
                 # logger.info(f"player_detections.class_id: {player_detections.class_id}")
 
                 goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
@@ -171,6 +180,19 @@ def main():
                 result = pitch_model(frame, conf=0.5)[0]
                 key_points = sv.KeyPoints.from_ultralytics(result)
 
+                frame_reference_points = key_points.xy[0]
+                frame_reference_key_points = sv.KeyPoints(xy=frame_reference_points[np.newaxis, ...])
+                pitch_reference_points = np.array(CONFIG.vertices)
+
+                view_transformer = ViewTransformer(
+                    source=pitch_reference_points,
+                    target=frame_reference_points)
+                
+                pitch_all_points = np.array(CONFIG.vertices)
+                frame_all_points = view_transformer.transform_points(pitch_all_points)
+                frame_all_key_points = sv.KeyPoints(xy=frame_all_points[np.newaxis, ...])
+
+
                 annotated_frame = frame.copy()
                 annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
                 annotated_frame = triangle_annotator.annotate(annotated_frame, ball_detections)
@@ -178,14 +200,14 @@ def main():
                 # annotated_frame = box_annotator.annotate(annotated_frame, detections)
                 annotated_frame = label_annotator.annotate(annotated_frame, all_detections, labels)
                 annotated_frame = vertex_annotator.annotate(annotated_frame, key_points)
+                annotated_frame = edge_annotator.annotate(annotated_frame, frame_reference_key_points)
 
-
-                video_sink.write_frame(annotated_frame)
-                # if PROCESS_FULL_VIDEO:
-                #     i+=1
-                #     break
-                # else:
-                #     sv.plot_image(annotated_frame)
+                if PROCESS_FULL_VIDEO:
+                    video_sink.write_frame(annotated_frame)
+                else:
+                    sv.plot_image(annotated_frame)
+                    cv2.imwrite(TARGET_IMAGE_PATH, annotated_frame)
+                    break
 
         # sv.plot_image(frame)
         # sv.plot_image(annotated_frame)
