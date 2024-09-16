@@ -112,61 +112,60 @@ def main():
         video_sink = sv.VideoSink(TARGET_VIDEO_PATH, video_info)
         frame_generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
         frame = next(frame_generator)
-        # with video_sink:
-        #     for frame in tqdm(frame_generator, total=video_info.total_frames):
+        with video_sink:
+            for frame in tqdm(frame_generator, total=video_info.total_frames):
 
-        result = model(frame)[0]
-        # print(f"result: {result}")
-        detections = sv.Detections.from_ultralytics(result)
-        # print(f"detections: {detections}")
-        # print(type(detections))
-        ball_detections = detections[detections.class_id == BALL_ID]
-        ball_detections.xyxy = sv.pad_boxes(ball_detections.xyxy, px=10)
-        all_detections = detections[detections.class_id != BALL_ID]
+                result = model(frame)[0]
+                # print(f"result: {result}")
+                detections = sv.Detections.from_ultralytics(result)
+                # print(f"detections: {detections}")
+                # print(type(detections))
+                ball_detections = detections[detections.class_id == BALL_ID]
+                ball_detections.xyxy = sv.pad_boxes(ball_detections.xyxy, px=10)
+                all_detections = detections[detections.class_id != BALL_ID]
 
-        all_detections = all_detections.with_nms(threshold=0.5, class_agnostic=False)
-        # all_detections.class_id = all_detections.class_id - 1
-        logger.info(f"all_detections.tracker_id: {all_detections.tracker_id}")
-        all_detections = tracker.update_with_detections(detections=all_detections)
+                all_detections = all_detections.with_nms(threshold=0.5, class_agnostic=False)
+                # all_detections.class_id = all_detections.class_id - 1
+                logger.info(f"all_detections.tracker_id: {all_detections.tracker_id}")
+                all_detections = tracker.update_with_detections(detections=all_detections)
 
-        player_detections = all_detections[all_detections.class_id == PLAYER_ID]
-        player_crops = [sv.crop_image(frame, xyxy) for xyxy in player_detections.xyxy]
-        logger.info(f"player_detections.class_id: {player_detections.class_id}")
-        player_detections.class_id = team_classifier.predict(player_crops)
-        logger.info(f"player_detections.class_id: {player_detections.class_id}")
+                player_detections = all_detections[all_detections.class_id == PLAYER_ID]
+                player_crops = [sv.crop_image(frame, xyxy) for xyxy in player_detections.xyxy]
+                logger.info(f"player_detections.class_id: {player_detections.class_id}")
+                player_detections.class_id = team_classifier.predict(player_crops)
+                logger.info(f"player_detections.class_id: {player_detections.class_id}")
 
-        goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
-        goalkeeper_detections.class_id = goalkeeper_classifier(player_detections, goalkeeper_detections)
+                goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
+                goalkeeper_detections.class_id = goalkeeper_classifier(player_detections, goalkeeper_detections)
 
-        referee_detections = all_detections[all_detections.class_id == REFEREE_ID]
+                referee_detections = all_detections[all_detections.class_id == REFEREE_ID]
 
-        all_detections = sv.Detections.merge([player_detections, goalkeeper_detections, referee_detections])
+                all_detections = sv.Detections.merge([player_detections, goalkeeper_detections, referee_detections])
 
-        labels = [
-            f"#{tracker_id}"
-            for tracker_id in all_detections.tracker_id
-        ]
-        logger.info(f"labels: {labels}")
+                labels = [
+                    f"#{tracker_id}"
+                    for tracker_id in all_detections.tracker_id
+                ]
+                logger.info(f"labels: {labels}")
 
-        result = pitch_model(frame, conf=0.5)[0]
-        key_points = sv.KeyPoints.from_ultralytics(result)
+                result = pitch_model(frame, conf=0.5)[0]
+                key_points = sv.KeyPoints.from_ultralytics(result)
 
-        annotated_frame = frame.copy()
-        annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
-        annotated_frame = triangle_annotator.annotate(annotated_frame, ball_detections)
+                annotated_frame = frame.copy()
+                annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
+                annotated_frame = triangle_annotator.annotate(annotated_frame, ball_detections)
 
-        # annotated_frame = box_annotator.annotate(annotated_frame, detections)
-        annotated_frame = label_annotator.annotate(annotated_frame, all_detections, labels)
-        annotated_frame = vertex_annotator.annotate(annotated_frame, key_points)
+                # annotated_frame = box_annotator.annotate(annotated_frame, detections)
+                annotated_frame = label_annotator.annotate(annotated_frame, all_detections, labels)
+                annotated_frame = vertex_annotator.annotate(annotated_frame, key_points)
 
 
 
-        # video_sink.write_frame(annotated_frame)
+                video_sink.write_frame(annotated_frame)
 
         # sv.plot_image(frame)
-        sv.plot_image(annotated_frame)
-        cv2.imwrite(TARGET_IMAGE_PATH, annotated_frame)
-        # cv2.imwrite(TARGET_IMAGE_PATH, cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
+        # sv.plot_image(annotated_frame)
+        # cv2.imwrite(TARGET_IMAGE_PATH, annotated_frame)
 
     # if not TEST:
     #     crops = extract_crops(model, SOURCE_VIDEO_PATH, stride=STRIDE)
