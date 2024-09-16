@@ -117,9 +117,9 @@ def main():
         i = 1
         with video_sink:
             for frame in tqdm(frame_generator, total=video_info.total_frames):
-                if i != 14:
-                    i+=1
-                    continue
+                # if i != 14:
+                #     i+=1
+                #     continue
 
                 result = model(frame)[0]
                 # print(f"result: {result}")
@@ -138,18 +138,30 @@ def main():
                 player_detections = all_detections[all_detections.class_id == PLAYER_ID]
                 player_crops = [sv.crop_image(frame, xyxy) for xyxy in player_detections.xyxy]
                 # logger.info(f"player_detections.class_id: {player_detections.class_id}")
-                player_detections.class_id = team_classifier.predict(player_crops)
+                # player_detections.class_id = team_classifier.predict(player_crops)
                 # logger.info(f"player_detections.class_id: {player_detections.class_id}")
 
                 goalkeeper_detections = all_detections[all_detections.class_id == GOALKEEPER_ID]
                 goalkeeper_detections.class_id = goalkeeper_classifier(player_detections, goalkeeper_detections)
 
                 referee_detections = all_detections[all_detections.class_id == REFEREE_ID]
+                # logger.info(f"goalkeeper_detections.class_id: {goalkeeper_detections.class_id}")
 
-                all_detections = sv.Detections.merge([player_detections, goalkeeper_detections, referee_detections])
-                logger.info(f"all_detections: {all_detections}")
-                logger.info(f"all_detections.class_id: {all_detections.class_id}")
-                logger.info(f"all_detections.tracker_id: {all_detections.tracker_id}")
+                # There is an issue with empty goalkeeper_detections
+                # all_detections = sv.Detections.merge([player_detections, goalkeeper_detections, referee_detections])
+
+                all_detections = sv.Detections(
+                    xyxy=np.empty((0, 4), dtype=np.float32),
+                    confidence=np.array([], dtype=np.float32),
+                    class_id=np.array([], dtype=int)
+                )
+                if player_detections.class_id.size != 0:
+                    all_detections = sv.Detections.merge([all_detections, player_detections])
+                if goalkeeper_detections.class_id.size != 0:
+                    all_detections = sv.Detections.merge([all_detections, goalkeeper_detections])
+                if referee_detections.class_id.size != 0:
+                    all_detections = sv.Detections.merge([all_detections, referee_detections])
+
                 labels = [
                     f"#{tracker_id}"
                     for tracker_id in all_detections.tracker_id
@@ -160,7 +172,7 @@ def main():
                 key_points = sv.KeyPoints.from_ultralytics(result)
 
                 annotated_frame = frame.copy()
-                annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
+                # annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
                 annotated_frame = triangle_annotator.annotate(annotated_frame, ball_detections)
 
                 # annotated_frame = box_annotator.annotate(annotated_frame, detections)
