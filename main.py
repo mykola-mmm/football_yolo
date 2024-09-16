@@ -162,6 +162,7 @@ def main():
 
 
                 video_sink.write_frame(annotated_frame)
+                break
 
         # sv.plot_image(frame)
         # sv.plot_image(annotated_frame)
