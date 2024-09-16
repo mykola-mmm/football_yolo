@@ -67,7 +67,10 @@ def main():
     # model_path = load_model_and_get_path_wandb(run=run, model_name="mykola-mazniuk-1/wandb-init/run_seq9v3hx_model:latest")
     model_path = './models/yolov9m_epoch284.pt'
     model = YOLO(model_path)
+    pitch_detection_model = "./models/pitch_keypoints_detection_yolov8x.pt"
+    pitch_model = YOLO(pitch_detection_model)
     print(model.info())
+    print(pitch_model.info())
 
     # initialize team classifier
     team_classifier = TeamClassifier(model_path, SIGLIP_MODEL_PATH)
@@ -90,10 +93,10 @@ def main():
             base=20, height=17
         )
 
-        # box_annotator = sv.BoxAnnotator(
-        #     color=sv.ColorPalette.DEFAULT,
-        #     thickness=2,
-        # )
+        vertex_annotator = sv.VertexAnnotator(
+            color=sv.Color.from_hex("#FFD700"),
+            radius=10,
+        )
 
         label_annotator = sv.LabelAnnotator(
             color=sv.ColorPalette.DEFAULT,
@@ -111,9 +114,6 @@ def main():
         frame = next(frame_generator)
         # with video_sink:
         #     for frame in tqdm(frame_generator, total=video_info.total_frames):
-        # print(f"model(frame): {model(frame)}")
-        raw_result = model(frame)
-        # logger.info(f"type(raw_result): {type(raw_result)}")
 
         result = model(frame)[0]
         # print(f"result: {result}")
@@ -148,6 +148,8 @@ def main():
         ]
         logger.info(f"labels: {labels}")
 
+        result = pitch_model(frame, conf=0.5)[0]
+        key_points = sv.KeyPoints.from_ultralytics(result)
 
         annotated_frame = frame.copy()
         annotated_frame = ellipse_annotator.annotate(annotated_frame, all_detections)
@@ -155,6 +157,7 @@ def main():
 
         # annotated_frame = box_annotator.annotate(annotated_frame, detections)
         annotated_frame = label_annotator.annotate(annotated_frame, all_detections, labels)
+        annotated_frame = vertex_annotator.annotate(annotated_frame, key_points)
 
 
 
